@@ -51,23 +51,30 @@ router.post('/add', (req, res, next) => {
 
 // GET the Game Details page in order to edit a new Game
 router.get('/:id', (req, res, next) => {
-    // get a reference to the id from the url
-    let id = req.params.id;
 
-    // find one game by its id
-    game.findById(id, (err, games) => {
-      if(err) {
-        console.log(err);
-        res.end(error);
-      } else {
-        // show the game details view
-        res.render('games/details', {
-            title: 'Game Details',
-            games: games
-        });
-      }
-    });
+    try {
+      // get a reference to the id from the url
+      let id = mongoose.Types.ObjectId.createFromHexString(req.params.id);
+
+        // find one game by its id
+      game.findById(id, (err, games) => {
+        if(err) {
+          console.log(err);
+          res.end(error);
+        } else {
+          // show the game details view
+          res.render('games/details', {
+              title: 'Game Details',
+              games: games
+          });
+        }
+      });
+    } catch (err) {
+      console.log(err);
+      res.redirect('/errors/404');
+    }
 });
+
 
 // POST - process the information passed from the details form and update the document
 router.post('/:id', (req, res, next) => {

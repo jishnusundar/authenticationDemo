@@ -50,22 +50,36 @@ app.use(express.static(path.join(__dirname, '../client')));
 app.use('/', index);
 app.use('/games', games);
 
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-  let err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+// Handle 404 Errors
+  app.use(function(req, res) {
+      res.status(400);
+     res.render('errors/404',{
+      title: '404: File Not Found'
+    });
+  });
 
-// error handler
-app.use((err, req, res, next) =>{
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  // Handle 500 Errors
+  app.use(function(error, req, res, next) {
+      res.status(500);
+      res.render('errors/500', {
+        title:'500: Internal Server Error',
+        error: error
+      });
+  });
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+//setup session
+app.use(session({
+secret: "SomeSecret",
+saveUninitialized: true,
+resave: true
+}));
+
+//initialize passport and flash
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
 
 module.exports = app;
