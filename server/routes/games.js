@@ -14,7 +14,7 @@ let game = require('../models/games');
 function requireAuth(req,res,next) {
   //check if the user is logged index
   if(!req.isAuthenticated()) {
-    return res.redirect('auth/login');
+    return res.redirect('/login');
   }
     next();
 }
@@ -29,7 +29,8 @@ router.get('/', requireAuth,(req, res, next) => {
     else {
       res.render('games/index', {
         title: 'Games',
-        games: games
+        games: games,
+  displayName : req.user ? req.user.displayName : ''
       });
     }
   });
@@ -40,7 +41,8 @@ router.get('/', requireAuth,(req, res, next) => {
 router.get('/add', requireAuth, (req, res, next) => {
   res.render('games/details', {
     title: "Add a new Game",
-    games: ''
+    games: '',
+  displayName : req.user ? req.user.displayName : ''
   });
 });
 
@@ -79,7 +81,8 @@ router.get('/:id', requireAuth,(req, res, next) => {
           // show the game details view
           res.render('games/details', {
               title: 'Game Details',
-              games: games
+              games: games,
+  displayName : req.user ? req.user.displayName : ''
           });
         }
       });
