@@ -47,19 +47,19 @@ router.get('/contact', (req, res, next) => {
 
 /* GET /Login - render the login view*/
 router.get('/login',(req, res, next) => {
-//check to see if the user is not already logged in 
-if(!req.user) {
-//render the login page
-res.render('auth/login', {
-  title: 'Login',
-  games: '',
-  messages: req.flash('loginMessage'),
-  displayName : req.user ? req.user.displayName : ''
-});
-return;
-} else {
-  return res.redirect('/games'); //redirect to the games list
-}
+  // check to see  if the user is not already logged index
+  if(!req.user) {
+    // render the login page
+    res.render('auth/login', {
+      title: 'Login',
+      games: '',
+      messages: req.flash('loginMessage'),
+      displayName: req.user ? req.user.displayName : ''
+    });
+    return;
+  } else {
+    return res.redirect('/games'); // redirect to the games list
+  }
 });
 
 
@@ -85,34 +85,38 @@ if(!req.user) {
 });
 
 // POST /register - process the registration page
-router.post('/register', (req,res,next) => {
-User.register(
-  new User({
-      username: req.body.username,
-      password: req.body.password,
-      email: req.body.email,
-      displayName: req.body.displayName
-    }),
-    req.body.password,
-    (err) => {
-      if(err) { //if error, re render register page with flash message
-        console.log('Error inserting new user');
-        if(err.name =='UserExisting') {
-          req.flash('registerMessage','Registration Error: User already exists!');
+router.post('/register', (req, res, next) => {
+  User.register(
+    new User({
+        username: req.body.username,
+        //password: req.body.password,
+        email: req.body.email,
+        displayName: req.body.displayName
+      }),
+      req.body.password,
+      (err) => {
+        if(err) {
+          console.log('Error insterting new user');
+          if(err.name == 'UserExistsError') {
+            req.flash('registerMessage', 'Registration Error: User Already Exists!');
+          }
+          return res.render('auth/register', {
+            title: 'Register',
+            games: '',
+            messages: req.flash('registerMessage'),
+            displayName: req.user ? req.user.displayName : ''
+          });
         }
-        return res.render('auth/register', {
-          title: 'Register',
-          games: '',
-          messages: req.flash('registerMessage'),
-          displayName : req.user ? req.user.displayName : ''
-
+        // if registration is successful
+        return passport.authenticate('local')(req, res, ()=>{
+          res.redirect('/games');
         });
-      }
-       //if registration is successful, log user into the website
-       return passport.authenticate('local')(req,res, ()=>{
-         res.redirect('/games');
-       });
-    });
+      });
 });
 
+//GET /logout - Logout the user and redirect to the home page
+router.get('/logout', (req,res,next) => {
+req.logout();
+res.redirect('/'); //redirect to home page
+});
 module.exports = router;
