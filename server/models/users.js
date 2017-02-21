@@ -10,12 +10,13 @@ let UserSchema = new Schema({
      trim: true, //string only
      required: 'Username is required' //message to flash box 
  },
+ /*
  password: {
      type: String,
      default: '',
      trim: true, //string only
      required: 'Password is required' //message to flash box 
- },
+ }, */
  email: {
      type: String,
      default: '',

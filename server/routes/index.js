@@ -85,7 +85,7 @@ if(!req.user) {
 });
 
 // POST /register - process the registration page
-router.post('/register', (req, res, next) => {
+router.post('/register', (req, res, next) =>  {
   User.register(
     new User({
         username: req.body.username,
