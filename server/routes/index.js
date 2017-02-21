@@ -70,4 +70,49 @@ failureRedirect: '/login',
 failureFlash: true
 }));
 
+// GET /register - render the register page
+router.get('/register',(req,res,next) => {
+//check if the user is not already logged in 
+if(!req.user) {
+  //render the registration page
+  res.render('auth/register', {
+    title: 'Register',
+  games: '',
+  messages: req.flash('registerMessage'),
+  displayName : req.user ? req.user.displayName : ''
+});
+}
+});
+
+// POST /register - process the registration page
+router.post('/register', (req,res,next) => {
+User.register(
+  new User({
+      username: req.body.username,
+      password: req.body.password,
+      email: req.body.email,
+      displayName: req.body.displayName
+    }),
+    req.body.password,
+    (err) => {
+      if(err) { //if error, re render register page with flash message
+        console.log('Error inserting new user');
+        if(err.name =='UserExisting') {
+          req.flash('registerMessage','Registration Error: User already exists!');
+        }
+        return res.render('auth/register', {
+          title: 'Register',
+          games: '',
+          messages: req.flash('registerMessage'),
+          displayName : req.user ? req.user.displayName : ''
+
+        });
+      }
+       //if registration is successful, log user into the website
+       return passport.authenticate('local')(req,res, ()=>{
+         res.redirect('/games');
+       });
+    });
+});
+
 module.exports = router;
